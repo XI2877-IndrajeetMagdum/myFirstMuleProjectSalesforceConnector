@@ -1,0 +1,68 @@
+#%RAML 1.0
+title: salesforce-rest-api
+#baseUri: http://localhost:8081
+
+mediaType: 
+- application/json
+protocols:
+  - HTTP
+version: v1
+
+/create:
+  post:
+    body:
+      application/json:
+        example:
+          !include examples/example1.raml
+    responses:
+            201:
+                    body:
+                            application/json:
+                              example:
+                                !include examples/example2.raml
+
+/delete:
+  delete:
+    body:
+      application/json:
+        example:
+          !include examples/example1.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include examples/example3.raml
+
+/update:
+  put:
+    body:
+      application/json:
+        example:
+          !include examples/example1.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include examples/example2.raml
+/get:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              !include examples/example5.raml
+  /{name}:
+    get:
+      queryParameters:
+        name:
+          type: string
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                !include examples/example4.raml
+                                          
