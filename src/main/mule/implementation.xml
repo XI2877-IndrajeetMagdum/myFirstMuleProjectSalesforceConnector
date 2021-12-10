@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="17639c53-50bf-4f52-9092-d5317a024736" >
+		<salesforce:basic-connection username="magdum0305indrajeet@gmail.com" password="0305@Indra" securityToken="BEV9qejphPXaE4NJWC0RC2BoR"/>
+	</salesforce:sfdc-config>
+	<flow name="create-pocFlow" doc:id="6c4381ba-9810-4634-a7e9-61eca846fdb0" >
+		<logger level="INFO" doc:name="Logger" doc:id="1e43db80-43dc-4c79-9357-794122184302" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="7c1c75a9-b4b6-4e91-9ea1-8a50f251061e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"Name":payload.Name,
+	"AccountNumber":payload.AccountNumber,
+	"Phone":payload.Phone,
+	"BillingCity":payload.BillingCity
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create type="Account" doc:name="Create" doc:id="53e5f0d1-2d54-4bbf-ab7b-1c535ec5991c" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="d62d5641-f872-43a6-b879-581677e47e38" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b4c755a7-b89a-4412-b341-09195ba5b793" message="#[payload]"/>
+	</flow>
+	<flow name="delete-pocFlow" doc:id="6cc48364-529e-4e20-82f9-41148fa80a43" >
+		<logger level="INFO" doc:name="Logger" doc:id="26a0737b-32b5-457e-9585-88124969b1c0" message="#[payload]"/>
+		<salesforce:query doc:name="Query" doc:id="ded9c7ff-4a00-4925-b987-0e8e11e53398" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT AccountNumber,Id,Name FROM Account WHERE Name=':name']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"name" : payload.Name
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<logger level="INFO" doc:name="Logger" doc:id="326ffe32-bcc8-4d8c-a1e4-908e5d451250" />
+		<ee:transform doc:name="Transform Message" doc:id="215f777d-e297-4e3f-bfff-1ebcd520e4c0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	payload[0].Id
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete" doc:id="6fff2ea9-0376-4350-88a2-338dd83a26e8" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="a73fca64-31b7-490f-b60b-1e656e37ce38" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="13911f20-16cf-4453-9398-91e8a293ddab" message="#[payload]"/>
+	</flow>
+	<flow name="update-pocFlow" doc:id="267a25fd-39df-4c6f-816b-3dfaa54d3f8f" >
+		<logger level="INFO" doc:name="Logger" doc:id="134f4fa5-7909-4ff5-9a84-e119a983477f" message="#[payload]"/>
+		<salesforce:query doc:name="Query" doc:id="ee093016-21d9-4f42-84d3-6b8e53d85143" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT AccountNumber,Id,Name FROM Account WHERE Name=':name']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"name" : payload.Name
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<logger level="INFO" doc:name="Logger" doc:id="d8a06a5c-7885-41a4-bfb2-aa96e9fc46b6" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="ef6300f1-5157-4ab3-996e-05013556a204" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"Id": payload[0].Id,
+	"Phone": "999999",
+	"BillingCity": "Shir"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update doc:name="Update" doc:id="6973dd36-17c5-4657-809e-ee3372f60da7" config-ref="Salesforce_Config" type="Account"/>
+		<ee:transform doc:name="Transform Message" doc:id="ea239f71-7a29-40fe-a8a3-8b2a7c166936" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b8e88a82-8889-453c-b9c2-011a11add35b" message="#[payload]"/>
+	</flow>
+	<flow name="get-pocFlow" doc:id="8b1efccf-7f62-46b3-982a-49d5c3cc4f09" >
+		<logger level="INFO" doc:name="Logger" doc:id="ed20d6e9-f483-40c4-b0a5-3e06a2f9c4d5" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="8f8d20e3-e46d-43fe-9407-55dc0880e0dc" >
+			<when expression='#[attributes.queryParams.qtype == "all"]'>
+				<salesforce:query doc:name="Query" doc:id="15b5fb5f-13c6-4471-9a3d-f8f63c17c4cc" config-ref="Salesforce_Config">
+					<salesforce:salesforce-query ><![CDATA[SELECT AccountNumber,Id,Name FROM Account WHERE Name=':name']]></salesforce:salesforce-query>
+					<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"name" : attributes.queryParams.name
+}]]]></salesforce:parameters>
+				</salesforce:query>
+			</when>
+			<otherwise >
+				<salesforce:query-all doc:name="Query all" doc:id="5c221cb7-1705-449e-a5c2-5a8837ad3b17" config-ref="Salesforce_Config" >
+					<salesforce:salesforce-query ><![CDATA[SELECT AccountNumber,Id,Name FROM Account]]></salesforce:salesforce-query>
+				</salesforce:query-all>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="c0beb5d2-9354-484d-8359-dd7088dd5038" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="20fff05a-2ae7-46fb-89dc-93cd62a1e644" message="#[payload]"/>
+	</flow></mule>

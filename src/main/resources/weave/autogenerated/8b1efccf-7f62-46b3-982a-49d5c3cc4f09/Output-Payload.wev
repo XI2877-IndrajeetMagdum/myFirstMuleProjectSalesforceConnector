@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_8b1efccf_7f62_46b3_982a_49d5c3cc4f09_Output_Payload = Array<Account>
+type Account = {|
+  AccountNumber?: String {"typeId": "AccountNumber"}, 
+  Id?: String {"typeId": "Id"}, 
+  Name?: String {"typeId": "Name"}
+|} {"typeId": "Account"}
+
+
+
